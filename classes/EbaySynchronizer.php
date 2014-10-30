@@ -368,6 +368,7 @@ class EbaySynchronizer
 			}
 			elseif (count($pictures) < $nb_pictures) // we upload every image if there are extra pictures
 				$pictures[] = EbayProductImage::getEbayUrl($pictures_default, $product->name.'_'.(count($pictures) + 1));
+				
 
 			$pictures_medium[] = EbaySynchronizer::_getPictureLink($product->id, $image['id_image'], $context->link, $small->name);
 			$pictures_large[] = EbaySynchronizer::_getPictureLink($product->id, $image['id_image'], $context->link, $large->name);
