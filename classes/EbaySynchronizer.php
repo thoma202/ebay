@@ -362,13 +362,14 @@ class EbaySynchronizer
 			$pictures_default = EbaySynchronizer::_getPictureLink($product->id, $image['id_image'], $context->link, $default->name);
 			if (((count($pictures) == 0) && ($nb_pictures == 1)) || self::_hasVariationProducts($variations)) // no extra picture, we don't upload the image
 			{
-				$pictures[] = $pictures_default;
+				if(count($pictures) == 0)
+					$pictures[] = $pictures_default;
                 $pictures_medium[] = EbaySynchronizer::_getPictureLink($product->id, $image['id_image'], $context->link, $small->name);
                 $pictures_large[] = EbaySynchronizer::_getPictureLink($product->id, $image['id_image'], $context->link, $large->name);                
 			}
 			elseif (count($pictures) < $nb_pictures) // we upload every image if there are extra pictures
 				$pictures[] = EbayProductImage::getEbayUrl($pictures_default, $product->name.'_'.(count($pictures) + 1));
-				
+
 
 			$pictures_medium[] = EbaySynchronizer::_getPictureLink($product->id, $image['id_image'], $context->link, $small->name);
 			$pictures_large[] = EbaySynchronizer::_getPictureLink($product->id, $image['id_image'], $context->link, $large->name);
@@ -474,7 +475,8 @@ class EbaySynchronizer
 				{
 					// If issue, it's because of https/http in the url
 					$link = EbaySynchronizer::_getPictureLink($product->id, $image['id_image'], $context->link, $large->name);
-					$variations[$product->id.'-'.$image['id_product_attribute'].'_'.$ebay_profile->id]['pictures'][] = $link;
+					if(count($variations[$product->id.'-'.$image['id_product_attribute'].'_'.$ebay_profile->id]['pictures']) < Configuration::get('EBAY_PICTURE_PER_LISTING') + 1)
+						$variations[$product->id.'-'.$image['id_product_attribute'].'_'.$ebay_profile->id]['pictures'][] = $link;
 				}
 
 		return $variations;
