@@ -1075,16 +1075,7 @@ class Ebay extends Module
             // find eBayProfile for this order
             // as a security, we retrieve several potential id_ebay_profiles and try all of them on the API
             $id_ebay_profiles = Db::getInstance()->ExecuteS('SELECT DISTINCT(ep.`id_ebay_profile`)
-                FROM `'._DB_PREFIX_.'ebay_product` ep
-                INNER JOIN `'._DB_PREFIX_.'order_detail` od
-                ON od.`product_id` = ep.`id_product`
-                AND od.`product_attribute_id` = ep.`id_attribute`
-                AND od.`id_order` = '.(int)$id_order.' 
-                INNER JOIN `'._DB_PREFIX_.'ebay_order_order` eoo
-                ON od.`id_order` = eoo.`id_order`
-                INNER JOIN `'._DB_PREFIX_.'ebay_profile` epr
-                ON eoo.`id_shop` = epr.`id_shop`
-                AND ep.`id_ebay_profile` = epr.`id_ebay_profile`');
+                FROM `'._DB_PREFIX_.'ebay_profile` ep');
             
             $order = new Order($id_order);
                         
