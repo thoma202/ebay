@@ -64,7 +64,7 @@
 	<ul id="stores_pagination" class="pagination">
 		<li class="prev"><</li>
 		{for $i=1 to ($nb_categorie / 20)|round:"0"}
-			<li{if $i == 0} class="current"{/if}>{$i}</li>
+			<li{if $i == 1} class="current"{/if}>{$i}</li>
 		{/for}
 		<li class="next">></li>
 	</ul>
