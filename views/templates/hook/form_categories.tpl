@@ -63,7 +63,7 @@
 		<li class="prev"><</li>
 		{math equation="floor(x/20)" x=$nb_categorie assign=nb_pages} 
 		{for $i=1 to ($nb_pages +1)}
-			<li{if $i == 0} class="current"{/if}>{$i}</li>
+			<li{if $i == 1} class="current"{/if}>{$i}</li>
 		{/for}
 		<li class="next">></li>
 	</ul>
