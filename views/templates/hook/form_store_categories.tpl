@@ -110,6 +110,7 @@
 	var module_path = '{$_path|escape:'htmlall'}';
 	var id_lang = '{$id_lang|escape:'htmlall'}';
 	var id_ebay_profile = '{$id_ebay_profile|escape:'htmlall'}';
+	var id_shop = '{$id_shop|escape:'htmlall'}';
 	var store_categories_ebay_l = {ldelim}
 		'No category found'		 : "{l s='No category found' mod='ebay'}",
 		'You are not logged in': "{l s='You are not logged in' mod='ebay'}",

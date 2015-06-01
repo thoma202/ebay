@@ -54,11 +54,14 @@ function array_insert_after($key, array &$array, $new_key, $new_value)
 $ebay = new Ebay();
 
 $ebay_profile = new EbayProfile((int)Tools::getValue('profile'));
+Context::getContext()->shop = new Shop(Tools::getValue('id_shop'));
 
 if (!Configuration::get('EBAY_SECURITY_TOKEN') || Tools::getValue('token') != Configuration::get('EBAY_SECURITY_TOKEN'))
 	return Tools::safeOutput(Tools::getValue('not_logged_str'));
 
-$category_list = $ebay->getChildCategories(Category::getCategories(Tools::getValue('id_lang')), version_compare(_PS_VERSION_, '1.5', '>') ? 1 : 0);
+$root_category = Category::getRootCategory();
+$category_list = $ebay->getChildCategories(Category::getCategories(Tools::getValue('id_lang')), $root_category->id);
+
 
 $offset = 20;
 $page = (int)Tools::getValue('p', 0);
