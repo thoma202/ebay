@@ -83,7 +83,8 @@ class EbayFormCategoryTab extends EbayTab
 			'module_name' => Tools::getValue('module_name'),
 			'date' => pSQL(date('Ymdhis')),
 			'form_categories' => EbaySynchronizer::getNbSynchronizableEbayCategorie($this->ebay_profile->id),
-			'nb_categorie' => count(Category::getCategories($this->context->cookie->id_lang, true, false))
+			'nb_categorie' => count(Category::getCategories($this->context->cookie->id_lang, true, false)),
+			'id_shop' => $this->context->shop->id
 		);
 
 		return $this->display('form_categories.tpl', $template_vars);

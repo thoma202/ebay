@@ -28,15 +28,19 @@ include_once dirname(__FILE__).'/../../../config/config.inc.php';
 include_once dirname(__FILE__).'/../../../init.php';
 include_once dirname(__FILE__).'/../ebay.php';
 
-$ebay = new Ebay();
+$context = Context::getContext();
+$context->shop = new Shop((int)Tools::getValue('id_shop'));
 
+$ebay = new Ebay();
 $ebay_profile = new EbayProfile((int)Tools::getValue('profile'));
+
 
 if (!Configuration::get('EBAY_SECURITY_TOKEN') || Tools::getValue('token') != Configuration::get('EBAY_SECURITY_TOKEN'))
 	return Tools::safeOutput(Tools::getValue('not_logged_str'));
 
+$root_category = Category::getRootCategory();
 $categories = Category::getCategories(Tools::getValue('id_lang'));
-$category_list = $ebay->getChildCategories($categories, version_compare(_PS_VERSION_, '1.5', '>') ? 1 : 0, array(), '', Tools::getValue('s'));
+$category_list = $ebay->getChildCategories($categories, $root_category->id, array(), '', Tools::getValue('s'));
 
 $offset = 20;
 $page = (int)Tools::getValue('p', 0);
