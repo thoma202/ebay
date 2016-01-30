@@ -76,6 +76,8 @@
 		{$return_policy}
 		{if isset($variations)}
 			{$variations}
+		{else if isset($product_listing_details)}
+            		{$product_listing_details}
 		{/if}
 		<ShippingDetails>{$shipping_details}</ShippingDetails>
 		{$buyer_requirements_details}
