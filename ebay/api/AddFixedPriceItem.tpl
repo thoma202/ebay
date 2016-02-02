@@ -76,7 +76,9 @@
 		{$return_policy}
 		{if isset($variations)}
 			{$variations}
-		{/if}
+		{else if isset($product_listing_details)}
+        	 	{$product_listing_details}
+		 {/if}
 		<ShippingDetails>{$shipping_details}</ShippingDetails>
 		{$buyer_requirements_details}
 		<Site>{$site}</Site>
@@ -94,9 +96,7 @@
                   <!--<StoreCategoryName> string </StoreCategoryName>-->
             </Storefront>
         {/if}
-        {if isset($product_listing_details)}
-            {$product_listing_details}
-        {/if}
+       
 	</Item>
 	<RequesterCredentials>
 		<eBayAuthToken>{$ebay_auth_token}</eBayAuthToken>
