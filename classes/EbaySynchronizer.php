@@ -737,33 +737,51 @@ class EbaySynchronizer
             $features_html .= '<b>'.$feature['name'].'</b> : '.$feature['value'].'<br/>';
         }
 
-        return str_replace(
-            array(
-                '{DESCRIPTION_SHORT}',
-                '{DESCRIPTION}',
-                '{FEATURES}',
-                '{EBAY_IDENTIFIER}',
-                '{EBAY_SHOP}',
-                '{SLOGAN}',
-                '{PRODUCT_NAME}',
-                '{REFERENCE}',
-                '{BRAND}',
-                '{BRAND_ID}',
-            ),
-            array(
-                $product->description_short,
-                $product->description,
-                $features_html,
-                $ebay_profile->ebay_user_identifier,
-                $ebay_profile->getConfiguration('EBAY_SHOP'),
-                '',
-                $product->name,
-                $product->reference,
-                Manufacturer::getNameById($product->id_manufacturer),
-                $product->id_manufacturer,
-            ),
-            $ebay_profile->getConfiguration('EBAY_PRODUCT_TEMPLATE')
+        $features = Feature::getFeatures($id_lang);
+        $features_product = $product->getFrontFeatures($id_lang);
+        $tags = array(
+            '{DESCRIPTION_SHORT}',
+            '{DESCRIPTION}',
+            '{FEATURES}',
+            '{EBAY_IDENTIFIER}',
+            '{EBAY_SHOP}',
+            '{SLOGAN}',
+            '{PRODUCT_NAME}',
+            '{REFERENCE}',
+            '{BRAND}',
+            '{BRAND_ID}',
         );
+        $values = array(
+            $product->description_short,
+            $product->description,
+            $features_html,
+            $ebay_profile->ebay_user_identifier,
+            $ebay_profile->getConfiguration('EBAY_SHOP'),
+            '',
+            $product->name,
+            $product->reference,
+            Manufacturer::getNameById($product->id_manufacturer),
+            $product->id_manufacturer,
+        );
+
+        foreach ($features as $feature) {
+            $tags[] = trim(str_replace(' ', '_', Tools::strtoupper('{FEATURE_'.$feature['name'].'}')));
+        }
+        $hasFeatures = array_map(array('EbayRequest', 'getValueOfFeature'), $features_product, $features);
+
+        foreach ($hasFeatures as $hasFeature) {
+            if (isset($hasFeature[0]) && $hasFeature[0]) {
+                $values[] = $hasFeature;
+            } else {
+                $values[] = '';
+            }
+        }
+
+        $content = $ebay_profile->getConfiguration('EBAY_PRODUCT_TEMPLATE');
+
+        $content = EbaySynchronizer::fillTemplateTitle($tags, $values, $content);
+
+        return $content;
     }
 
     /**
@@ -1205,7 +1223,7 @@ class EbaySynchronizer
             if ($item_specific['id_feature']) {
                 $value = EbaySynchronizer::__getFeatureValue($product->id, $item_specific['id_feature'], $id_lang);
             } elseif ($item_specific['is_brand']) {
-                $value = $product->manufacturer_name;
+                $value = ($product->manufacturer_name) ? pSQL($product->manufacturer_name) : "Unbranded";
             } elseif ($item_specific['is_reference']) {
                 $value = $product->reference;
             } elseif ($item_specific['is_ean']) {

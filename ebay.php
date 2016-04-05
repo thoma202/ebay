@@ -2026,7 +2026,53 @@ class Ebay extends Module
 
         $data['features'] = $features_html;
 
-        $content = EbaySynchronizer::fillAllTemplate($data, $content);
+        $tags = array(
+            '{MAIN_IMAGE}',
+            '{MEDIUM_IMAGE_1}',
+            '{MEDIUM_IMAGE_2}',
+            '{MEDIUM_IMAGE_3}',
+            '{PRODUCT_PRICE}',
+            '{PRODUCT_PRICE_DISCOUNT}',
+            '{DESCRIPTION_SHORT}',
+            '{DESCRIPTION}',
+            '{FEATURES}',
+            '{EBAY_IDENTIFIER}',
+            '{EBAY_SHOP}',
+            '{SLOGAN}',
+            '{PRODUCT_NAME}',
+        );
+        $values = array(
+            (isset($data['large_pictures'][0]) ? '<img src="'.Tools::safeOutput($data['large_pictures'][0]).'" class="bodyMainImageProductPrestashop" />' : ''),
+            (isset($data['medium_pictures'][1]) ? '<img src="'.Tools::safeOutput($data['medium_pictures'][1]).'" class="bodyFirstMediumImageProductPrestashop" />' : ''),
+            (isset($data['medium_pictures'][2]) ? '<img src="'.Tools::safeOutput($data['medium_pictures'][2]).'" class="bodyMediumImageProductPrestashop" />' : ''),
+            (isset($data['medium_pictures'][3]) ? '<img src="'.Tools::safeOutput($data['medium_pictures'][3]).'" class="bodyMediumImageProductPrestashop" />' : ''),
+            $data['price'],
+            $data['price_without_reduction'],
+            $data['description_short'],
+            $data['description'],
+            $data['features'],
+            Configuration::get('EBAY_IDENTIFIER'),
+            Configuration::get('EBAY_SHOP'),
+            Configuration::get('PS_SHOP_NAME'),
+            $data['name'],
+        );
+        $features = Feature::getFeatures($id_lang);
+        $features_product = $product->getFrontFeatures($id_lang);
+
+        foreach ($features as $feature) {
+            $tags[] = trim(str_replace(' ', '_', Tools::strtoupper('{FEATURE_'.$feature['name'].'}')));
+        }
+        $hasFeatures = array_map(array('EbayRequest', 'getValueOfFeature'), $features_product, $features);
+
+        foreach ($hasFeatures as $hasFeature) {
+            if (isset($hasFeature[0]) && $hasFeature[0]) {
+                $values[] = $hasFeature;
+            } else {
+                $values[] = '';
+            }
+        }
+
+        $content = EbaySynchronizer::fillTemplateTitle($tags, $values, $content);
 
         echo $content;
     }

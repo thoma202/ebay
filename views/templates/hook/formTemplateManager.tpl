@@ -62,6 +62,9 @@
 			<option value="{ldelim}EBAY_SHOP{rdelim}">{ldelim}EBAY_SHOP{rdelim}</option>
 			<option value="{ldelim}SLOGAN{rdelim}">{ldelim}SLOGAN{rdelim}</option>
 			<option value="{ldelim}PRODUCT_NAME{rdelim}">{ldelim}PRODUCT_NAME{rdelim}</option>
+			{foreach from=$features_product item=feature}
+				<option value="{ldelim}FEATURE_{$feature.name|upper|replace:' ':'_'|trim|escape:'htmlall':'UTF-8'}{rdelim}">{ldelim}FEATURE_{$feature.name|upper|replace:' ':'_'|trim|escape:'htmlall':'UTF-8'}{rdelim}</option>
+			{/foreach}
 		</select>
 		<textarea style="width:100%" class="rte" cols="100" rows="50" name="ebay_product_template">{$ebay_product_template}</textarea><br />
 		{if $is_one_dot_three}
