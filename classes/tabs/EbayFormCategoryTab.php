@@ -72,7 +72,7 @@ class EbayFormCategoryTab extends EbayTab
         if (!isset($configs['EBAY_CATEGORY_LOADED_'.$ebay_site_id]) || !$configs['EBAY_CATEGORY_LOADED_'.$ebay_site_id] || !EbayCategory::areCategoryLoaded($ebay_site_id) || Tools::getValue('resynchCategories')) {
 
             if(Tools::getValue('resynchCategories')){
-                $sql = ("TRUNCATE TABLE `'._DB_PREFIX_.'ebay_category_configuration`");
+                $sql = ("TRUNCATE TABLE `"._DB_PREFIX_."ebay_category_configuration`");
                 Db::getInstance()->execute($sql);
             }
             $load_cat = true;
