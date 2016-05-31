@@ -104,6 +104,12 @@ class EbayFormCategoryTab extends EbayTab
             'load_cat' => $load_cat,
             'launch_load_cat' => Tools::getValue('id_tab') == 2 ? true : false,
             'admin_path' => basename(_PS_ADMIN_DIR_),
+            'help_Cat_upd' => array(
+                'lang'           => $this->context->country->iso_code,
+                'module_version' => $this->ebay->version,
+                'ps_version'     => _PS_VERSION_,
+                'error_code'     => 'HELP-CATEGORY-UPDATE',
+            ),
         );
 
         return $this->display('form_categories.tpl', $template_vars);

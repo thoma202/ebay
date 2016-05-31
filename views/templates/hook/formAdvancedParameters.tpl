@@ -246,7 +246,7 @@
 
 		<div id="div_resynch"  style="display:none; height: 100px;   text-align: center; margin-top: 27px;font-family: sans-serif;
     font-size: 14px;">
-			<span> {l s='Have you read this article about category definition & reloading ?' mod='ebay'}</span>
+			<span> {l s='Have you read ' mod='ebay'}<a class="kb-help" style ="width: auto;height: 20px;background-image: none;" data-errorcode="{$help_Cat_upd.error_code}" data-module="ebay" data-lang="{$help_Cat_upd.lang}" module_version="{$help_Cat_upd.module_version}" prestashop_version="{$help_Cat_upd.ps_version}" href="" target="_blank">{l s='this article' mod='ebay'}</a>{l s=' about category definition & reloading?' mod='ebay'}</span>
 			</br>
 			</br>
 			<input type="checkbox" name="accepted" id="accepted" value="yes" ><span style="color: red;"> {l s='I have understood all my categories will need to reconfigured manually' mod='ebay'}</span> <br>

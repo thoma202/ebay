@@ -68,7 +68,7 @@
 	<div style="display:block" class="warning big tips">{l s='Miss some item specifics ? You may need to upgrade category definitions :' mod='ebay'}
 		</br>{l s='-  You can compare your category definitions with last available category definitions from eBay using the ' mod='ebay'}<a href="#comparaison" id='link_cat_support_i'>{l s='comparison tool' mod='ebay'}</a>
 		</br>{l s='-  If needed, you can upgrade category definition using the ' mod='ebay'}<a id='link_cat_support_reload_i' href="#resynch">{l s='upgrade tool.' mod='ebay'}</a>
-		</br>{l s='New to category definition concept ? Please read' mod='ebay'} <a href="#">{l s='category definition & reloading article first.' mod='ebay'}</a>
+		</br>{l s='New to category definition concept ? Please read ' mod='ebay'}<a class="kb-help" style ="display: inline-block;width: auto;height: 20px;background-image: none;"data-errorcode="{$help_Cat_upd.error_code}" data-module="ebay" data-lang="{$help_Cat_upd.lang}" module_version="{$help_Cat_upd.module_version}" prestashop_version="{$help_Cat_upd.ps_version}" href="" target="_blank">{l s='category definition & reloading article first.' mod='ebay'}</a>
 
 	</div>
 
