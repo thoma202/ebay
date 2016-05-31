@@ -28,7 +28,8 @@
 	<script>
 		$(document).ready(function() {
 			var win = window.location = '{/literal}{$redirect_url|escape:'UTF-8'}{literal}';
-		});
+		});		
+
 	</script>
 	{/literal}
 {/if}
@@ -122,7 +123,7 @@
 
     <fieldset style="margin-top:10px;">
        
-        <legend>{l s='EAN Sync' mod='ebay'} <a class="kb-help" data-errorcode="{$help_ean.error_code}" data-module="ebay" data-lang="{$help_ean.lang}" module_version="{$help_ean.module_version}" prestashop_version="{$help_ean.ps_version}" href="" target="_blank"></a></legend>
+        <legend>{l s='EAN Sync' mod='ebay'} <a class="kb-help" data-errorcode="{$help_ean.error_code}" data-module="ebay" data-lang="{$help_ean.lang}" module_version="{$help_ean.module_version}" prestashop_version="{$help_ean.ps_version}" href="http://help.202-ecommerce.com/fr/ebay-pour-prestashop/les-problemes-de-configuration-courants/solutions-specifiques-a-ebay/ajouter-les-codes-produits-a-vos-annonces-ebay-avec-le-module-ebay/" target="_blank"></a></legend>
 
         <label>{l s='Synchronize EAN with :' mod='ebay'}</label>
         <div class="margin-form">
