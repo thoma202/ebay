@@ -752,11 +752,11 @@ class Ebay extends Module
             ($this->ebay_profile->getConfiguration('EBAY_ORDER_LAST_UPDATE') < date('Y-m-d\TH:i:s', strtotime('-30 minutes')).'.000Z')
             || Tools::getValue('EBAY_SYNC_ORDERS') == 1) {
 
-            EbayOrderErrors::truncate();
-
             $current_date = date('Y-m-d\TH:i:s').'.000Z';
             // we set the new last update date after retrieving the last orders
             $this->ebay_profile->setConfiguration('EBAY_ORDER_LAST_UPDATE', $current_date);
+
+            EbayOrderErrors::truncate();
 
             if ($orders = $this->__getEbayLastOrders($current_date)) {
                 $this->importOrders($orders);
