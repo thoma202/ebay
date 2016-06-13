@@ -33,7 +33,7 @@
 		{if isset($autopay)}
 			<AutoPay>{$autopay|escape:'htmlall':'UTF-8'}</AutoPay>
 		{/if}        
-		<Title>{$title|cleanHtml}</Title>
+		<Title><![CDATA[{$title|cleanHtml}]]></Title>
 		{if count($pictures)}
 			<PictureDetails>
 				<GalleryType>Gallery</GalleryType>
