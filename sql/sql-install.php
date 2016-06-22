@@ -355,3 +355,19 @@ $sql[] = 'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'ebay_order_log` (
     `date_update` datetime,
 	PRIMARY KEY  (`id_ebay_order_log`)
 ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8;';
+
+$sql[] = 'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'Ebay_Business_Policies` (
+    `id` INT(6)AUTO_INCREMENT PRIMARY KEY,
+    `type` VARCHAR(30) NOT NULL,
+    `name` VARCHAR(30) NOT NULL,
+    `id_busines_Policie` VARCHAR(30),
+    `id_ebay_profile` int
+)ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8;';
+
+$sql[] = 'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'ebay_category_business_config` (
+    `id` INT(6)AUTO_INCREMENT PRIMARY KEY,
+    `id_category` int(11) NOT NULL,
+    `id_return` VARCHAR(30) ,
+    `id_payment` VARCHAR(30),
+    `id_ebay_profile` int
+)ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8;';

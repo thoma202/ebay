@@ -49,6 +49,9 @@
 		<PrimaryCategory>
 			<CategoryID>{$category_id|escape:'htmlall':'UTF-8'}</CategoryID>
 		</PrimaryCategory>
+
+
+
 		<ConditionID>{if $condition_id > 0}{$condition_id|escape:'htmlall':'UTF-8'}{else}1000{/if}</ConditionID>
 		{if $price_update && isset($start_price)}
 			<StartPrice>{$start_price|escape:'htmlall':'UTF-8'}</StartPrice>
@@ -79,7 +82,9 @@
 		{elseif isset($product_listing_details)}
             {$product_listing_details|cleanHtml}
         {/if}
+		{if isset($shipping_details)}
 		<ShippingDetails>{$shipping_details|cleanHtml}</ShippingDetails>
+		{/if}
 		{$buyer_requirements_details|cleanHtml}
 		<Site>{$site|escape:'htmlall':'UTF-8'}</Site>
         

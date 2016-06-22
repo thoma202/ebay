@@ -347,7 +347,7 @@ class EbayDbValidator
     }
     private function addColumns($table, $field, $arguments){
         $sql = 'ALTER TABLE `'._DB_PREFIX_.$table.'` 
-                ADD '.$field.' '.$arguments['type'].'('.$arguments['length'].')';
+                ADD '.bqSQL($field).' '.bqSQL($arguments['type']).'('.pSQL($arguments['length']).')';
 
 
         return Db::getInstance()->Execute($sql);;

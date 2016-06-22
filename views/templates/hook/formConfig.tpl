@@ -56,7 +56,8 @@
     
 	<li id="menuTab3" class="menuTabButton {$shippingValidator.indicator|escape:'htmlall':'UTF-8'}">5. {l s='Dispatch and Shipping' mod='ebay'}</li>
     
-	<li id="menuTab4" class="menuTabButton {$templateValidator.indicator|escape:'htmlall':'UTF-8'}">6. {l s='Template manager' mod='ebay'}</li>    
+	<li id="menuTab4" class="menuTabButton {$templateValidator.indicator|escape:'htmlall':'UTF-8'}">6. {l s='Template manager' mod='ebay'}</li>
+	<li id="menuTab77" class="menuTabButton {$templateValidator.indicator|escape:'htmlall':'UTF-8'}">7. {l s='Business Policies' mod='ebay'}</li>
     
 </ul>
 
@@ -163,6 +164,9 @@
 	<div id="menuTab14Sheet" class="tabItem">{$orders_sync}</div>
     <div id="menuTab15Sheet" class="tabItem">{$ps_products}</div>
 	<div id="menuTab16Sheet" class="tabItem">{$orphan_listings}</div>
+	<div id="menuTab77Sheet" class="tabItem">
+		{$form_business_policies|ebayHtml}
+	</div>
 </div>
 <br clear="left" />
 <br />

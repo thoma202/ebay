@@ -81,11 +81,13 @@ $classes_to_load = array(
     'tabs/EbayOrdersSyncTab',
     'tabs/EbayPrestashopProductsTab',
     'tabs/EbayOrphanListingsTab',
+    'tabs/EbayFormBusinessPoliciesTab',
     'EbayAlert',
     'EbayOrderErrors',
     'EbayDbValidator',
     'EbayKb',
     'EbayLogger',
+    'EbayBussinesPolicies',
 );
 
 foreach ($classes_to_load as $classname) {
@@ -126,7 +128,7 @@ class Ebay extends Module
     {
         $this->name = 'ebay';
         $this->tab = 'market_place';
-        $this->version = '1.13.2';
+        $this->version = '1.13.3';
         $this->stats_version = '1.0';
 
         $this->author = 'PrestaShop';
@@ -319,6 +321,7 @@ class Ebay extends Module
         $this->ebay_profile = EbayProfile::getCurrent();
 
         $this->setConfiguration('EBAY_INSTALL_DATE', date('Y-m-d\TH:i:s.000\Z'));
+        $this->setConfiguration('EBAY_BUSINESS_POLICIES',0);
         // Picture size
         if ($this->ebay_profile) {
             $this->ebay_profile->setPicturesSettings();
@@ -1547,6 +1550,9 @@ class Ebay extends Module
         } elseif (Tools::getValue('section') == 'advanced_parameters') {
             $tab = new EbayFormAdvancedParametersTab($this, $this->smarty, $this->context);
         }
+        elseif (Tools::getValue('section') == 'bussinespolicies') {
+            $tab = new EbayFormBusinessPoliciesTab($this, $this->smarty, $this->context);
+        }
 
         if (isset($tab)) {
             $this->html .= $tab->postProcess();
@@ -1702,6 +1708,7 @@ class Ebay extends Module
         $orders_sync = new EbayOrdersSyncTab($this, $this->smarty, $this->context);
         $ps_products = new EbayPrestashopProductsTab($this, $this->smarty, $this->context);
         $orphan_listings = new EbayOrphanListingsTab($this, $this->smarty, $this->context);
+        $form_business_policies = new EbayFormBusinessPoliciesTab($this, $this->smarty, $this->context);
 
         $form_store_category_tab = new EbayFormStoreCategoryTab($this, $this->smarty, $this->context, $this->_path);
 
@@ -1754,6 +1761,7 @@ class Ebay extends Module
             'admin_path' => basename(_PS_ADMIN_DIR_),
             'load_kb_path' => _MODULE_DIR_.'ebay/ajax/loadKB.php',
             'alert_exit_import_categories' => $this->l('Import of eBay category is running.'),
+            'form_business_policies' => $form_business_policies->getContent(),
         );
 
         $this->smarty->assign($smarty_vars);

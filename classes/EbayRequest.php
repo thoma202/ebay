@@ -45,7 +45,7 @@ class EbayRequest
     private $loginUrl;
     private $compatibility_level;
     private $debug;
-    private $dev = false;
+    private $dev = true;
     /** @var EbayCountrySpec */
     private $ebay_country;
     /** @var Smarty_Data */
@@ -56,6 +56,7 @@ class EbayRequest
     private $ebay_profile;
     /** @var Context */
     private $context;
+    private $apiUrlSeller;
 
     private $write_api_logs;
 
@@ -93,6 +94,7 @@ class EbayRequest
             $this->appID = 'Prestash-2629-4880-ba43-368352aecc86';
             $this->certID = '6bd3f4bd-3e21-41e8-8164-7ac733218122';
             $this->apiUrl = 'https://api.sandbox.ebay.com/ws/api.dll';
+            $this->apiUrlSeller = 'http://svcs.sandbox.ebay.com/services/selling/v1/SellerProfilesManagementService';
             $this->compatibility_level = 719;
             $this->runame = 'Prestashop-Prestash-2629-4-hpehxegu';
             $this->loginURL = $this->ebay_country->getSiteSignin();
@@ -100,6 +102,7 @@ class EbayRequest
             $this->appID = 'Prestash-70a5-419b-ae96-f03295c4581d';
             $this->certID = '71d26dc9-b36b-4568-9bdb-7cb8af16ac9b';
             $this->apiUrl = 'https://api.ebay.com/ws/api.dll';
+            $this->apiUrlSeller = 'https://svcs.ebay.com/services/selling/v1/SellerProfilesManagementService';
             $this->compatibility_level = 741;
             $this->runame = 'Prestashop-Prestash-70a5-4-pepwa';
             $this->loginURL = $this->ebay_country->getSiteSignin();
@@ -124,7 +127,7 @@ class EbayRequest
         if ($response === false) {
             return false;
         }
-
+        $this->importBusinessPolicies();
         return ($this->session = (string)$response->SessionID);
     }
 
@@ -165,7 +168,9 @@ class EbayRequest
             'SellerBusinessType' => $response->User->SellerBusinessType,
         );
 
+
         $this->apiUrl = $apiUrl;
+
 
         return $userProfile;
     }
@@ -440,14 +445,16 @@ class EbayRequest
             'postal_code'                => $this->ebay_profile->getConfiguration('EBAY_SHOP_POSTALCODE'),
             'quantity'                   => $data['quantity'],
             'item_specifics'             => $data['item_specifics'],
-            'return_policy'              => $this->_getReturnPolicy(),
-            'shipping_details'           => $this->_getShippingDetails($data),
+            'return_policy'              => $this->_getReturnPolicy($data),
             'buyer_requirements_details' => $this->_getBuyerRequirementDetails($data),
             'site'                       => $this->ebay_country->getSiteName(),
             'autopay'                    => $this->ebay_profile->getConfiguration('EBAY_IMMEDIATE_PAYMENT'),
             'product_listing_details'    => $this->_getProductListingDetails($data),
 
         );
+        if(EbayConfiguration::get($this->ebay_profile->id,'EBAY_BUSINESS_POLICIES')==0){
+            $vars['shipping_details'] = $this->_getShippingDetails($data);
+        }
 
         if (isset($data['price_original']) && ($data['price_original'] > $data['price'])) {
             $vars['price_original'] = $data['price_original'];
@@ -475,6 +482,8 @@ class EbayRequest
             return false;
         }
 
+
+
         $vars = array(
             'item_id'                    => $data['itemID'],
             'condition_id'               => $data['condition'],
@@ -488,9 +497,8 @@ class EbayRequest
             'resynchronize'              => ($this->ebay_profile->getConfiguration('EBAY_SYNC_OPTION_RESYNC') != 1),
             'title'                      => Tools::substr(self::prepareTitle($data), 0, 80),
             'description'                => $data['description'],
-            'shipping_details'           => $this->_getShippingDetails($data),
             'buyer_requirements_details' => $this->_getBuyerRequirementDetails($data),
-            'return_policy'              => $this->_getReturnPolicy(),
+            'return_policy'              => $this->_getReturnPolicy($data),
             'item_specifics'             => $data['item_specifics'],
             'country'                    => Tools::strtoupper($this->ebay_profile->getConfiguration('EBAY_SHOP_COUNTRY')),
             'autopay'                    => $this->ebay_profile->getConfiguration('EBAY_IMMEDIATE_PAYMENT'),
@@ -498,7 +506,11 @@ class EbayRequest
 
         );
 
-        if (isset($data['ebay_store_category_id']) && $data['ebay_store_category_id']) {
+        if(EbayConfiguration::get($this->ebay_profile->id,'EBAY_BUSINESS_POLICIES')==0){
+            $vars['shipping_details'] = $this->_getShippingDetails($data);
+        }
+	
+	  if (isset($data['ebay_store_category_id']) && $data['ebay_store_category_id']) {
             $vars['ebay_store_category_id'] = $data['ebay_store_category_id'];
         }
 
@@ -507,7 +519,7 @@ class EbayRequest
         }
 
         $response = $this->_makeRequest('ReviseFixedPriceItem', $vars);
-
+        ebay::debug($vars);
         $this->_logApiCall('reviseFixedPriceItem', $vars, $response, $data['id_product']);
 
         if ($response === false) {
@@ -562,17 +574,19 @@ class EbayRequest
             'category_id'                => $data['categoryId'],
             'title'                      => Tools::substr(self::prepareTitle($data), 0, 80),
             'pictures'                   => isset($data['pictures']) ? $data['pictures'] : array(),
-            'return_policy'              => $this->_getReturnPolicy(),
+            'return_policy'              => $this->_getReturnPolicy($data),
             'price_update'               => !isset($data['noPriceUpdate']),
             'variations'                 => $this->_getVariations($data),
             'product_listing_details'    => $this->_getProductListingDetails($data),
-            'shipping_details'           => $this->_getShippingDetails($data),
             'buyer_requirements_details' => $this->_getBuyerRequirementDetails($data),
             'site'                       => $this->ebay_country->getSiteName(),
             'item_specifics'             => $data['item_specifics'],
             'autopay'                    => $this->ebay_profile->getConfiguration('EBAY_IMMEDIATE_PAYMENT'),
         );
 
+        if(EbayConfiguration::get($this->ebay_profile->id,'EBAY_BUSINESS_POLICIES')==0){
+            $vars['shipping_details'] = $this->_getShippingDetails($data);
+        }
         if (isset($data['ebay_store_category_id']) && $data['ebay_store_category_id']) {
             $vars['ebay_store_category_id'] = $data['ebay_store_category_id'];
         }
@@ -632,11 +646,10 @@ class EbayRequest
             'postal_code'                => $this->ebay_profile->getConfiguration('EBAY_SHOP_POSTALCODE'),
             'category_id'                => $data['categoryId'],
             'pictures'                   => isset($data['pictures']) ? $data['pictures'] : array(),
-            'return_policy'              => $this->_getReturnPolicy(),
+            'return_policy'              => $this->_getReturnPolicy($data),
             'resynchronize'              => ($this->ebay_profile->getConfiguration('EBAY_SYNC_OPTION_RESYNC') != 1),
             'title'                      => Tools::substr(self::prepareTitle($data), 0, 80),
             'description'                => $data['description'],
-            'shipping_details'           => $this->_getShippingDetails($data),
             'buyer_requirements_details' => $this->_getBuyerRequirementDetails($data),
             'site'                       => $this->ebay_country->getSiteName(),
             'variations'                 => $this->_getVariations($data),
@@ -644,6 +657,10 @@ class EbayRequest
             'item_specifics'             => $data['item_specifics'],
             'autopay'                    => $this->ebay_profile->getConfiguration('EBAY_IMMEDIATE_PAYMENT'),
         );
+
+        if(EbayConfiguration::get($this->ebay_profile->id,'EBAY_BUSINESS_POLICIES')==0){
+            $vars['shipping_details'] = $this->_getShippingDetails($data);
+        }
 
         if (isset($data['ebay_store_category_id']) && $data['ebay_store_category_id']) {
             $vars['ebay_store_category_id'] = $data['ebay_store_category_id'];
@@ -825,8 +842,9 @@ class EbayRequest
         return $this->smarty->fetch(dirname(__FILE__).'/../ebay/api/GetBuyerRequirementDetails.tpl');
     }
 
-    private function _getReturnPolicy()
+    private function _getReturnPolicy($data=null)
     {
+        
         $returns_policy_configuration = $this->ebay_profile->getReturnsPolicyConfiguration();
         $vars = array(
             'returns_accepted_option' => $returns_policy_configuration->ebay_returns_accepted_option,
@@ -834,6 +852,63 @@ class EbayRequest
             'within'                  => $returns_policy_configuration->ebay_returns_within,
             'whopays'                 => $returns_policy_configuration->ebay_returns_who_pays,
         );
+
+        if(EbayConfiguration::get($this->ebay_profile->id,'EBAY_BUSINESS_POLICIES')==1){
+
+            $policies_config = EbayBussinesPolicies::getPoliciesConfigurationbyIdCategory($data['categoryId'],$this->ebay_profile->id);
+
+            $payement_name = EbayBussinesPolicies::getPoliciesbyID($policies_config[0]['id_payment'],$this->ebay_profile->id);
+            $return_name = EbayBussinesPolicies::getPoliciesbyID($policies_config[0]['id_return'],$this->ebay_profile->id);
+
+
+           $shippings=$data['shipping'];
+            $policies_ship_name='';
+            
+            foreach ($shippings['nationalShip'] as $key => $national) {
+                $policies_ship_name .= $key.'_'.$national[0]['serviceAdditionalCosts'];
+                }
+
+            $policies_ship_name= rtrim($policies_ship_name, "-");
+
+
+            $seller_ship_prof=Db::getInstance()->getValue('SELECT `id` FROM '._DB_PREFIX_.'ebay_business_policies WHERE name="'.$policies_ship_name.'"');
+            ebay::debug($this->ebay_country);
+            if(empty($seller_ship_prof)){
+                $vars = array(
+                    'excluded_zones'         => $data['shipping']['excludedZone'],
+                    'national_services'      => $data['shipping']['nationalShip'],
+                    'international_services' => $data['shipping']['internationalShip'],
+                    'currency_id'            => $this->ebay_country->getCurrency(),
+                    'ebay_site_id'  =>  $this->ebay_profile->ebay_site_id,
+                    'shipping_name' => $policies_ship_name,
+                );
+                $this->smarty->assign($vars);
+                $response = $this->_makeRequest('addSellerProfile', $vars,'seller');
+            }
+
+
+
+
+
+            ////
+
+
+
+
+
+
+
+            $shippings = EbayBussinesPolicies::getPoliciesbyName($policies_ship_name,$this->ebay_profile->id);
+            $vars = array(
+                'payment_profile_id' => $policies_config[0]['id_payment'],
+                'payment_profile_name'             => $payement_name[0]['name'],
+                'return_profile_id'                  => $policies_config[0]['id_return'],
+                'return_profile_name'                 =>  $return_name[0]['name'],
+                'shipping_profile_id'                  => $shippings[0]['id_bussines_Policie'],
+                'shipping_profile_name'                 =>  $shippings[0]['name'],
+            );
+            
+        }
 
         Ebay::addSmartyModifiers();
 
@@ -1018,6 +1093,25 @@ class EbayRequest
         return $headers;
     }
 
+    private function _buildHeaders_seller($api_call)
+    {
+
+        $headers = array(
+
+            // Regulates versioning of the XML interface for the API
+
+            'X-EBAY-SOA-GLOBAL-ID: EBAY-'.$this->ebay_country->getIsoCode(),
+            'X-EBAY-SOA-OPERATION-NAME: '.$api_call,
+            'X-EBAY-SOA-SERVICE-VERSION: 1.0.0',
+            'X-EBAY-SOA-SECURITY-TOKEN: '.$this->ebay_profile->getToken(),
+            'X-EBAY-API-DEV-NAME: '.$this->devID,
+            'X-EBAY-API-APP-NAME: '.$this->appID,
+            'X-EBAY-API-CERT-NAME: '.$this->certID,
+        );
+
+        return $headers;
+    }
+
     /**
      * @param       $api_call
      * @param array $vars
@@ -1026,26 +1120,35 @@ class EbayRequest
      */
     private function _makeRequest($api_call, $vars = array(), $shoppingEndPoint = false)
     {
+
         $vars = array_merge($vars, array(
             'ebay_auth_token' => ($this->ebay_profile ? $this->ebay_profile->getToken() : ''),
-            'error_language'  => $this->ebay_country->getLanguage(),
+            'error_language' => $this->ebay_country->getLanguage(),
         ));
 
         $this->smarty->assign($vars);
-        $request = $this->smarty->fetch(dirname(__FILE__).'/../ebay/api/'.$api_call.'.tpl');
+        $request = $this->smarty->fetch(dirname(__FILE__) . '/../ebay/api/' . $api_call . '.tpl');
 
         $connection = curl_init();
-        curl_setopt($connection, CURLOPT_URL, $this->apiUrl);
+        if($shoppingEndPoint === 'seller'){
+            curl_setopt($connection, CURLOPT_URL, $this->apiUrlSeller);
+        } else {
+            curl_setopt($connection, CURLOPT_URL, $this->apiUrl);
+        }
         curl_setopt($connection, CURLINFO_HEADER_OUT, true);
 
         // Stop CURL from verifying the peer's certificate
         curl_setopt($connection, CURLOPT_SSL_VERIFYPEER, 0);
         curl_setopt($connection, CURLOPT_SSL_VERIFYHOST, 0);
-
         // Set the headers (Different headers depending on the api call !)
-        if ($shoppingEndPoint) {
+        if ($shoppingEndPoint === true) {
+
             curl_setopt($connection, CURLOPT_HTTPHEADER, $this->_buildHeadersShopping($api_call));
-        } else {
+        }
+    elseif($shoppingEndPoint === 'seller') {
+
+        curl_setopt($connection, CURLOPT_HTTPHEADER, $this->_buildHeaders_seller($api_call));
+    } else {
             curl_setopt($connection, CURLOPT_HTTPHEADER, $this->_buildHeaders($api_call));
         }
 
@@ -1064,7 +1167,7 @@ class EbayRequest
                 file_put_contents(dirname(__FILE__).'/../log/request.txt', "<?php\n\n", FILE_APPEND | LOCK_EX);
             }
 
-            file_put_contents(dirname(__FILE__).'/../log/request.txt', date('d/m/Y H:i:s')."\n\n HEADERS : \n".print_r($this->_buildHeaders($api_call), true), FILE_APPEND | LOCK_EX);
+            file_put_contents(dirname(__FILE__).'/../log/request.txt', date('d/m/Y H:i:s')."\n\n HEADERS : \n".print_r($this->_buildHeaders_seller($api_call), true), FILE_APPEND | LOCK_EX);
 
             file_put_contents(dirname(__FILE__).'/../log/request.txt', date('d/m/Y H:i:s')."\n\n".$request."\n\n".$response."\n\n-------------------\n\n", FILE_APPEND | LOCK_EX);
         }
@@ -1202,4 +1305,52 @@ class EbayRequest
 
         return ((int)$val['id_feature'] == (int)$feature['id_feature'] ? $val['value'] : false);
     }
+
+    public function getUserPreferences(){
+
+        $this->apiCall = 'GetUserPreferences';
+
+        $vars = array(
+            'version'      => $this->compatibility_level,
+            'error_language'  => $this->ebay_country->getLanguage(),
+            
+        );
+
+        $response = $this->_makeRequest('GetUserPreferences', $vars);
+
+
+        return $response->SellerProfilePreferences;
+    }
+
+    public function importBusinessPolicies(){
+
+        $datas = $this->getUserPreferences();
+        $config_business_policies=0;
+        $config=(array)$datas->SellerProfileOptedIn;
+
+        if($config[0] === 'true'){
+           
+            $config_business_policies=1;
+        }
+
+        EbayConfiguration::set($this->ebay_profile->id,'EBAY_BUSINESS_POLICIES',$config_business_policies);
+       
+        if($datas->SupportedSellerProfiles){
+        foreach ($datas->SupportedSellerProfiles->children() as $data ) {
+            $data = (array)$data;
+            $var = array(
+                'type' => $data['ProfileType'],
+                'name' => $data['ProfileName'],
+                'id_bussines_Policie' => $data['ProfileID'],
+                'id_ebay_profile' => $this->ebay_profile->id
+            );
+
+            Db::getInstance()->insert('ebay_business_policies', $var);
+        }
+
+        }
+
+
+    }
+
 }
