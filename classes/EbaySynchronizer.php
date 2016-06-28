@@ -580,12 +580,12 @@ class EbaySynchronizer
             } else {
                 $price = Product::getPriceStatic((int)$combinaison['id_product'], true, (int)$combinaison['id_product_attribute'] );
                 $price_original = Product::getPriceStatic((int)$combinaison['id_product'], true, (int)$combinaison['id_product_attribute'], 6, null, false, false);
-            }
 
-            // convert price to destination currency
-            $currency = new Currency((int)$ebay_profile->getConfiguration('EBAY_CURRENCY'));
-            $price *= $currency->conversion_rate;
-            $price_original *= $currency->conversion_rate;
+                 // convert price to destination currency
+                 $currency = new Currency((int)$ebay_profile->getConfiguration('EBAY_CURRENCY'));
+                 $price *= $currency->conversion_rate;
+                 $price_original *= $currency->conversion_rate;
+            }
 
             $variation = array(
                 'id_attribute'        => $combinaison['id_product_attribute'],
